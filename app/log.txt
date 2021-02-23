@@ -1,0 +1,1 @@
+2021-02-21 23:25:53 -//- SQLSTATE[HY000] [1045] Access denied for user 'roo'@'localhost' (using password: YES)
