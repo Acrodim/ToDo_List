@@ -51,6 +51,7 @@ CREATE TABLE `todo_tasks`
     `is_done`      TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
     `title`        VARCHAR(50)         NOT NULL COLLATE 'utf8_general_ci',
     `created_at`   DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `task_position` INT(10) UNSIGNED   NOT NULL DEFAULT 100,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`todo_list_id`) REFERENCES `todo_lists` (`id`) ON DELETE RESTRICT ON UPDATE NO ACTION
 );
