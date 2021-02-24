@@ -1,9 +1,19 @@
 <?php
+$meta_title = "Your lists"; // название формы
+
+if (!empty($_SESSION['warning'])) {
+    echo $_SESSION['warning'];
+    unset($_SESSION['warning']);
+}
 
 $sth = $pdo->prepare('SELECT * FROM `todo_lists` WHERE user_id = :user_id ORDER BY created_at DESC');
 $sth->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $sth->execute();
 $user_lists = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+//echo '<pre>';
+//print_r($user_lists);
+//echo '</pre>';
 
 if (!empty($_POST['title'])) {
     $title = $_POST['title'];
@@ -19,27 +29,37 @@ if (!empty($_POST['title'])) {
 
 if (!empty($_GET['del_id'])) {
     $id = $_GET['del_id'];
-    $sql = 'DELETE FROM `todo_lists` WHERE `id` = ?';
-    $query = $pdo->prepare($sql);
-    $query->execute([$id]);
 
-    header('Location: /lists');
+    $sth = $pdo->prepare('SELECT id FROM `todo_tasks` WHERE todo_list_id = :todo_list_id');
+    $sth->bindParam(':todo_list_id', $id, PDO::PARAM_INT);
+    $sth->execute();
+    $list_id = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!empty($list_id)) {
+        $_SESSION['warning'] = "<div class=\"alert alert-warning row col-sm-7 mx-auto\" role=\"alert\">
+                                    Before deleting of this <?php print_r($user_lists) ?>ToDo List you should delete tasks it contains!
+                                </div>";
+        header('Location: /lists');
+    } else {
+        $sql = 'DELETE FROM `todo_lists` WHERE `id` = ?';
+        $query = $pdo->prepare($sql);
+        $query->execute([$id]);
+
+        header('Location: /lists');
+    }
 }
 ?>
 
-<div class="col-sm-6">
-    <h2>Create new list</h2>
+<!--    <h4><mark>Your to-do lists, --><?//= $user_login ?><!--</mark></h4>-->
     <form action="" method="post">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" name="title" placeholder="Enter name for new list">
+            <input type="text" class="form-control" name="title" placeholder="Enter title to create new list" required>
             <button class="btn btn-outline-secondary" type="submit">Add</button>
         </div>
     </form>
-</div>
 
-     <div>
-         <h2>Your lists, <?= $user_login ?></h2>
-         <table class="table table-bordered">
+
+         <table class="table table-bordered table-hover list">
              <thead>
              <tr>
                  <th scope="col" style="width: 45%">List name</th>
@@ -63,4 +83,4 @@ if (!empty($_GET['del_id'])) {
 
              </tbody>
          </table>
-     </div>
+

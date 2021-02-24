@@ -6,12 +6,6 @@ session_start();
 //session_destroy();
 //session_unset();
 
-// Get all tasks for current user
-//$sth = $pdo->prepare('SELECT * FROM `todo_tasks` WHERE todo_list_id = :todo_list_id ORDER BY id DESC');
-//$sth->bindParam(':todo_list_id', $_SESSION['todo_list_id'], PDO::PARAM_INT);
-//$sth->execute();
-//$allLists = $sth->fetchAll(PDO::FETCH_ASSOC);
-
 function parseUrl($url)
 {
     $data = [];
@@ -30,7 +24,6 @@ $view = ($url[0]) ? $url[0] : 'main';
 if ($_SESSION['user']) {
     $user_id = $_SESSION['user']['id'];
     $user_login = $_SESSION['user']['login'];
-//    $todo_list_id
 } else {
     $login = '';
 }
@@ -38,7 +31,7 @@ if ($_SESSION['user']) {
 switch ($view) {
     case 'main':
         ob_start();
-        include_once 'app/views/main.php';
+        $user_id ? include_once 'app/views/lists.php' : include_once 'app/views/main.php';
         $content = ob_get_clean();
         break;
 

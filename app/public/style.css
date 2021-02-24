@@ -1,0 +1,15 @@
+.list a {
+    display: block;
+}
+
+td a {
+    width:100%;
+    line-height:40px;
+    display:inline-block;
+    text-decoration: none;
+    color: black;
+}
+
+nav {
+    margin-bottom: 50px;
+}

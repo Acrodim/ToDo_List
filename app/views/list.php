@@ -1,6 +1,8 @@
 <?php
+$meta_title = "Your tasks"; // название формы
+
 $todo_list_id = $url[1];
-$sth = $pdo->prepare('SELECT * FROM `todo_tasks` WHERE todo_list_id = :todo_list_id ORDER BY created_at DESC');
+$sth = $pdo->prepare('SELECT * FROM `todo_tasks` WHERE todo_list_id = :todo_list_id ORDER BY task_position');
 $sth->bindParam(':todo_list_id', $todo_list_id, PDO::PARAM_INT);
 $sth->execute();
 $user_tasks = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -50,7 +52,7 @@ if (!empty($_GET['edit_id'])) {
 ?>
 
 <form action="" method="post">
-    <h1 class="text-center">ToDoList <span><?= '' ?></span></h1>
+    <a href="/lists">Back to your lists</a>
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Write new task" name="title" required>
         <button type="submit" class="btn btn-outline-secondary">Add</button>
@@ -98,3 +100,24 @@ if (!empty($_GET['edit_id'])) {
 
     </tbody>
 </table>
+
+<?php
+
+if (!empty($_GET['up'])) {
+    $id = $_GET['up'];
+
+    foreach ($user_tasks as $key => $task) {
+        if ($task['id'] == $id) {
+            $current_array_position = $key;
+        }
+    }
+    $new_position = $user_tasks[$current_array_position-1]['task_position'] - 1;
+
+    if($new_position > 0) {
+        $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
+        $query = $pdo->prepare($sql);
+        $query->execute([$new_position, $id]);
+    }
+
+    header('Location: ' . $url[1]);
+}

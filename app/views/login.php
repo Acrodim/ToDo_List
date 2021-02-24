@@ -1,5 +1,5 @@
 <?php
-$title = "Registration form"; // название формы
+$meta_title = "Authorization form"; // название формы
 
 if (!empty($_SESSION['warning'])) {
     echo $_SESSION['warning'];
@@ -15,9 +15,9 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
     $sth->execute();
     $user = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-    echo '<pre>';
-    print_r($_SESSION['user']);
-    echo '</pre>';
+//    echo '<pre>';
+//    print_r($_SESSION['user']);
+//    echo '</pre>';
 
     if (!empty($user)) {
         if ($user[0]['login'] == $login && $user[0]['pass'] == $pass) {
@@ -25,18 +25,18 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
             $_SESSION['user']['login'] = $user[0]['login'];
             header('Location: /lists');
         } else {
-            $_SESSION['warning'] = '<div class="alert alert-warning" role="alert">Login or password is not exists!</div>';
+            $_SESSION['warning'] = '<div class="alert alert-warning row col-sm-4 mx-auto" role="alert">Login or password is not exists!</div>';
             header('Location: /login');
         }
     } else {
-        $_SESSION['warning'] = '<div class="alert alert-warning" role="alert">Login is not exists!</div>';
+        $_SESSION['warning'] = '<div class="alert alert-warning row col-sm-4 mx-auto" role="alert">Login is not exists!</div>';
         header('Location: /login');
     }
 }
 
 ?>
 
-<div class="row">
+<div class="row col-sm-4 mx-auto">
     <div class="col">
         <!-- Форма авторизации -->
         <h2>Authorization</h2>
