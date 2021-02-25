@@ -1,6 +1,7 @@
 <?php
 $meta_title = "Your tasks"; // название формы
 
+// Select all tasks of the current list
 $todo_list_id = $url[1];
 $sth = $pdo->prepare('SELECT * FROM `todo_tasks` WHERE todo_list_id = :todo_list_id ORDER BY task_position');
 $sth->bindParam(':todo_list_id', $todo_list_id, PDO::PARAM_INT);
@@ -13,7 +14,7 @@ $user_tasks = $sth->fetchAll(PDO::FETCH_ASSOC);
 if (!empty($_POST['title'])) {
     $title = $_POST['title'];
     $last_task_position = array_pop($user_tasks);
-    $new_task_position = $last_task_position['task_position'] + 100;
+    $new_task_position = $last_task_position['task_position'] + 1000;
 
 //    $sth = $pdo->prepare('INSERT INTO todo_tasks (title, todo_list_id) VALUES(:title, :todo_list_id)');
 //    $sth->bindParam(':title', $title, PDO::PARAM_STR);
@@ -29,6 +30,7 @@ if (!empty($_POST['title'])) {
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 }
 
+// Deleting of the task
 if (!empty($_GET['del_id'])) {
     $id = $_GET['del_id'];
     $sql = 'DELETE FROM `todo_tasks` WHERE `id` = ?';
@@ -38,6 +40,7 @@ if (!empty($_GET['del_id'])) {
     header('Location: ' . $url[1]);
 }
 
+// Marking "Completed" or "Check as done" of the task
 if (!empty($_GET['edit_id'])) {
     $id = $_GET['edit_id'];
     $sth = $pdo->prepare('SELECT is_done FROM `todo_tasks` WHERE id = :id');
@@ -58,8 +61,142 @@ if (!empty($_GET['edit_id'])) {
     header('Location: ' . $url[1]);
 }
 
+
+// Sorting of the tasks
+if (!empty($_GET['up'])) {
+    $id = $_GET['up'];
+
+    foreach ($user_tasks as $key => $task) {
+        if ($task['id'] == $id) {
+            $current_array_position = $key;
+        }
+    }
+
+    if (isset($user_tasks[$current_array_position - 1])) {
+        $new_position_current_task = $user_tasks[$current_array_position - 1]['task_position'];
+        $new_position_previous_task = $user_tasks[$current_array_position]['task_position'];
+        $previous_task_id = $user_tasks[$current_array_position - 1]['id'];
+    }
+
+    if (isset($previous_task_id)) {
+        $sth = $pdo->prepare('UPDATE todo_tasks
+                SET task_position = CASE id
+                               WHEN :previous_task_id THEN :new_position_previous_task
+                               WHEN :id THEN :new_position_current_task
+                    END
+                WHERE id IN (:previous_task_id, :id)');
+        $sth->bindParam(':previous_task_id', $previous_task_id, PDO::PARAM_INT);
+        $sth->bindParam(':new_position_previous_task', $new_position_previous_task, PDO::PARAM_INT);
+        $sth->bindParam(':id', $id, PDO::PARAM_INT);
+        $sth->bindParam(':new_position_current_task', $new_position_current_task, PDO::PARAM_INT);
+        $sth->execute();
+
+        header('Location: ' . $url[1]);
+    }
+}
+
+if (!empty($_GET['down'])) {
+    $id = $_GET['down'];
+
+    foreach ($user_tasks as $key => $task) {
+        if ($task['id'] == $id) {
+            $current_array_position = $key;
+        }
+    }
+
+    if (isset($user_tasks[$current_array_position + 1])) {
+        $new_position_current_task = $user_tasks[$current_array_position + 1]['task_position'];
+        $new_position_next_task = $user_tasks[$current_array_position]['task_position'];
+        $next_task_id = $user_tasks[$current_array_position + 1]['id'];
+    }
+
+    if (isset($next_task_id)) {
+        $sth = $pdo->prepare('UPDATE todo_tasks
+                SET task_position = CASE id
+                               WHEN :next_task_id THEN :new_position_next_task
+                               WHEN :id THEN :new_position_current_task
+                    END
+                WHERE id IN (:next_task_id, :id)');
+        $sth->bindParam(':next_task_id', $next_task_id, PDO::PARAM_INT);
+        $sth->bindParam(':new_position_next_task', $new_position_next_task, PDO::PARAM_INT);
+        $sth->bindParam(':id', $id, PDO::PARAM_INT);
+        $sth->bindParam(':new_position_current_task', $new_position_current_task, PDO::PARAM_INT);
+        $sth->execute();
+
+        header('Location: ' . $url[1]);
+    }
+}
+
+//if (!empty($_GET['down'])) {
+//    $id = $_GET['down'];
+//
+//    foreach ($user_tasks as $key => $task) {
+//        if ($task['id'] == $id) {
+//            $current_array_position = $key;
+//        }
+//    }
+//
+//    if (isset($user_tasks[$current_array_position+1])) {
+//        $new_position = $user_tasks[$current_array_position + 1]['task_position'] + 1;
+//    }
+//}
+//
+//if($new_position > 0) {
+//    $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
+//    $query = $pdo->prepare($sql);
+//    $query->execute([$new_position, $id]);
+//
+//    header('Location: ' . $url[1]);
+//}
+
+/*// Sorting of the tasks
+if (!empty($_GET['up'])) {
+    $id = $_GET['up'];
+
+    foreach ($user_tasks as $key => $task) {
+        if ($task['id'] == $id) {
+            $current_array_position = $key;
+        }
+    }
+
+    if (isset($user_tasks[$current_array_position - 1])) {
+        $new_position = $user_tasks[$current_array_position - 1]['task_position'] - 10;
+    }
+}
+
+if($new_position > 0) {
+    $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
+    $query = $pdo->prepare($sql);
+    $query->execute([$new_position, $id]);
+
+    header('Location: ' . $url[1]);
+}
+
+if (!empty($_GET['down'])) {
+    $id = $_GET['down'];
+
+    foreach ($user_tasks as $key => $task) {
+        if ($task['id'] == $id) {
+            $current_array_position = $key;
+        }
+    }
+
+    if (isset($user_tasks[$current_array_position+1])) {
+        $new_position = $user_tasks[$current_array_position + 1]['task_position'] + 10;
+    }
+}
+
+if($new_position > 0) {
+    $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
+    $query = $pdo->prepare($sql);
+    $query->execute([$new_position, $id]);
+
+    header('Location: ' . $url[1]);
+}*/
+
 ?>
 
+<!--The form for adding new task to the current list-->
 <form action="" method="post">
     <a href="/lists">Back to your lists</a>
     <div class="input-group mb-3">
@@ -67,7 +204,9 @@ if (!empty($_GET['edit_id'])) {
         <button type="submit" class="btn btn-outline-secondary">Add</button>
     </div>
 </form>
+    <!--End of the form for adding new task to the current list-->
 
+    <!--    The table with tasks of the current list-->
 <table class="table table-bordered">
     <thead>
     <tr>
@@ -79,6 +218,7 @@ if (!empty($_GET['edit_id'])) {
     </tr>
     </thead>
     <tbody>
+
 
     <?php foreach ($user_tasks as $task): ?>
         <tr<?= $task['is_done'] == 1 ? ' class="table-success"' : '' ?>>
@@ -118,6 +258,7 @@ if (!empty($_GET['edit_id'])) {
 
     </tbody>
 </table>
+    <!--    End of the table with tasks of the current list-->
 
 <?php
 foreach ($user_tasks as $task) {
@@ -162,46 +303,3 @@ foreach ($user_tasks as $task) {
 //    header('Location: ' . $url[1]);
 //}
 
-if (!empty($_GET['up'])) {
-    $id = $_GET['up'];
-
-    foreach ($user_tasks as $key => $task) {
-        if ($task['id'] == $id) {
-            $current_array_position = $key;
-        }
-    }
-
-    if (isset($user_tasks[$current_array_position - 1])) {
-        $new_position = $user_tasks[$current_array_position - 1]['task_position'] - 10;
-    }
-}
-
-if($new_position > 0) {
-    $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
-    $query = $pdo->prepare($sql);
-    $query->execute([$new_position, $id]);
-
-    header('Location: ' . $url[1]);
-}
-
-if (!empty($_GET['down'])) {
-    $id = $_GET['down'];
-
-    foreach ($user_tasks as $key => $task) {
-        if ($task['id'] == $id) {
-            $current_array_position = $key;
-        }
-    }
-
-    if (isset($user_tasks[$current_array_position+1])) {
-        $new_position = $user_tasks[$current_array_position + 1]['task_position'] + 10;
-    }
-}
-
-if($new_position > 0) {
-    $sql = 'UPDATE todo_tasks SET task_position = ? WHERE id = ?';
-    $query = $pdo->prepare($sql);
-    $query->execute([$new_position, $id]);
-
-    header('Location: ' . $url[1]);
-}
