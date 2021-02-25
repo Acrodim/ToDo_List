@@ -4,7 +4,13 @@
  *
  *  # todo_lists
  *   - id (unsigned, autoincrement)
+ *   - user_id (unsigned - reference to the user table)
  *   - created_at (datetime)
+ *
+ *  *  # users
+ *   - id (unsigned, autoincrement)
+ *   - title (varchar)
+ *   - pass (varchar)
  *
  *  # todo_tasks
  *   - id (unsigned, autoincrement)
@@ -12,12 +18,20 @@
  *   - is_done (tinyint(1))
  *   - title (varchar)
  *   - created_at (datetime)
+ *   - task_position (unsigned)
+ *
  */
 
 /** @var \PDO $pdo */
 require_once './pdo_ini.php';
 
-// todo_lists
+// Create database
+$sql = <<<'SQL'
+CREATE DATABASE to_do_list;
+SQL;
+$pdo->exec($sql);
+
+// Create table "todo_lists"
 $sql = <<<'SQL'
 CREATE TABLE `todo_lists`
 (
@@ -30,9 +44,9 @@ CREATE TABLE `todo_lists`
 SQL;
 $pdo->exec($sql);
 
-// users
+// Create table "users"
 $sql = <<<'SQL'
-CREATE TABLE IF NOT EXISTS `users`
+CREATE TABLE `users`
 (
     `id`    int(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
     `login` varchar(200) UNIQUE NOT NULL,
@@ -42,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `users`
 SQL;
 $pdo->exec($sql);
 
-// todo_tasks
+// Create table "todo_tasks"
 $sql = <<<'SQL'
 CREATE TABLE `todo_tasks`
 (

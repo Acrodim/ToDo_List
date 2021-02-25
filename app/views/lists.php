@@ -1,20 +1,14 @@
 <?php
-$meta_title = "Your lists"; // название формы
+$meta_title = "Your lists"; // page title
 
-if (!empty($_SESSION['warning'])) {
-    echo $_SESSION['warning'];
-    unset($_SESSION['warning']);
-}
+include_once 'app/views/warning_message.php';
 
 $sth = $pdo->prepare('SELECT * FROM `todo_lists` WHERE user_id = :user_id ORDER BY created_at DESC');
 $sth->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 $sth->execute();
 $user_lists = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-//echo '<pre>';
-//print_r($user_lists);
-//echo '</pre>';
-
+// adding a new list
 if (!empty($_POST['title'])) {
     $title = $_POST['title'];
 
@@ -27,6 +21,7 @@ if (!empty($_POST['title'])) {
     header('Location: http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 }
 
+// deleting the list
 if (!empty($_GET['del_id'])) {
     $id = $_GET['del_id'];
 
@@ -50,37 +45,37 @@ if (!empty($_GET['del_id'])) {
 }
 ?>
 
-<!--    <h4><mark>Your to-do lists, --><?//= $user_login ?><!--</mark></h4>-->
-    <form action="" method="post">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" name="title" placeholder="Enter title to create new list" required>
-            <button class="btn btn-outline-secondary" type="submit">Add</button>
-        </div>
-    </form>
+<!-- adding a new list-->
+<form action="" method="post">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" name="title" placeholder="Enter title to create new list" required>
+        <button class="btn btn-outline-secondary" type="submit">Add</button>
+    </div>
+</form>
 
+<!-- The table of the user's lists-->
+<table class="table table-bordered table-hover list">
+    <thead>
+    <tr>
+        <th scope="col" style="width: 45%">List name</th>
+        <th scope="col" style="width: 10%">Date</th>
+        <th scope="col" style="width: 5%">Delete</th>
+    </tr>
+    </thead>
+    <tbody>
 
-         <table class="table table-bordered table-hover list">
-             <thead>
-             <tr>
-                 <th scope="col" style="width: 45%">List name</th>
-                 <th scope="col" style="width: 10%">Date</th>
-                 <th scope="col" style="width: 5%">Delete</th>
-             </tr>
-             </thead>
-             <tbody>
+    <?php foreach ($user_lists as $list): ?>
+        <tr>
+            <td><a href="list/<?= $list['id'] ?>"><?= $list['title'] ?></a></td>
+            <td><?= $list['created_at'] ?></td>
+            <td>
+                <a href="?del_id=<?= $list['id'] ?>">
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                </a>
+            </td>
+        </tr>
+    <?php endforeach ?>
 
-             <?php foreach ($user_lists as $list): ?>
-                 <tr>
-                     <td><a href="list/<?= $list['id'] ?>"><?= $list['title'] ?></a></td>
-                     <td><?= $list['created_at'] ?></td>
-                     <td>
-                         <a href="?del_id=<?= $list['id'] ?>">
-                             <button type="button" class="btn-close" aria-label="Close"></button>
-                         </a>
-                     </td>
-                 </tr>
-             <?php endforeach ?>
-
-             </tbody>
-         </table>
+    </tbody>
+</table>
 

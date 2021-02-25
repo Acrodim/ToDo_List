@@ -19,8 +19,12 @@
     <div class="container">
         <ul class="nav justify-content-end">
             <li class="nav-item">
+                <a class="nav-link disabled" aria-current="page" href="/"><?= $user_login ?></a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="/">Home</a>
             </li>
+
             <?php if (!empty($user_id)): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="/logout">LogOut</a>

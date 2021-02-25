@@ -1,10 +1,7 @@
 <?php
-$meta_title = "Registration form"; // название формы
+$meta_title = "Registration form"; // page title
 
-if (!empty($_SESSION['warning'])) {
-    echo $_SESSION['warning'];
-    unset($_SESSION['warning']);
-}
+include_once 'app/views/warning_message.php';
 
 if (!empty($_POST['login']) && !empty($_POST['pass'])) {
     $login = $_POST['login'];
@@ -29,11 +26,12 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
         header('Location: /login');
     }
 }
+
 ?>
 
+<!--Registration form-->
 <div class="row col-sm-4 mx-auto">
     <div class="col">
-        <!-- Форма регистрации -->
         <h2>Registration</h2>
         <form action="" method="post">
             <input type="text" class="form-control" name="login" placeholder="Enter login" value="<?= $login ?>" required><br>
