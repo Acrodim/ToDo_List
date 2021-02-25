@@ -23,7 +23,7 @@
  */
 
 /** @var \PDO $pdo */
-require_once './pdo_ini.php';
+require_once 'app/db/pdo_ini.php';
 
 // Create database
 $sql = <<<'SQL'

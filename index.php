@@ -1,6 +1,6 @@
 <?php
-// Connection to DB
-require_once 'app/pdo_ini.php';
+/** @var \PDO $pdo */
+require_once 'app/db/pdo_ini.php';
 
 session_start();
 
