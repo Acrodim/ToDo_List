@@ -50,7 +50,7 @@ CREATE TABLE `users`
 (
     `id`    int(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
     `login` varchar(200) UNIQUE NOT NULL,
-    `pass`  varchar(32)         NOT NULL,
+    `pass`  varchar(255)        NOT NULL,
     PRIMARY KEY (`id`)
 );
 SQL;
