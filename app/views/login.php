@@ -20,15 +20,17 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
         } else {
             $_SESSION['warning'] = '<div class="alert alert-warning row col-sm-4 mx-auto" 
                                     role="alert">Login or password is not exists!</div>';
+            $_SESSION['login'] = $login;
             header('Location: /login');
         }
     } else {
         $_SESSION['warning'] = '<div class="alert alert-warning row col-sm-4 mx-auto" 
                                 role="alert">Login is not exists!</div>';
+        $_SESSION['login'] = $login;
+
         header('Location: /login');
     }
 }
-
 ?>
 
 <!-- Authorization form -->
@@ -37,7 +39,7 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
         <h2>Authorization</h2>
         <form action="" method="post">
             <input type="text" class="form-control" name="login" id="login"
-                   placeholder="Enter login" value="<?= $login ?>" required><br>
+                   placeholder="Enter login" value="<?= $_SESSION['login'] ?>" required><br>
             <input type="password" class="form-control" name="pass" placeholder="Enter password" required><br>
             <button class="btn btn-success" name="signup" type="submit">SignIn</button>
         </form>

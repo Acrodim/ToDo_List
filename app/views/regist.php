@@ -15,6 +15,7 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
     if (!empty($user)) {
         $_SESSION['warning'] = '<div class="alert alert-warning row col-sm-4 mx-auto" 
                                 role="alert">User with this login is already registered. Try signIn!</div>';
+        $_SESSION['login'] = $login;
         header('Location: /register');
     } else {
         $sth = $pdo->prepare('INSERT INTO users (login, pass) VALUES(:login, :pass)');
@@ -36,7 +37,7 @@ if (!empty($_POST['login']) && !empty($_POST['pass'])) {
         <h2>Registration</h2>
         <form action="" method="post">
             <input type="text" class="form-control" name="login"
-                   placeholder="Enter login" value="<?= $login ?>" required><br>
+                   placeholder="Enter login" value="<?= $_SESSION['login'] ?>" required><br>
             <input type="password" class="form-control" name="pass" placeholder="Enter password" required><br>
             <button class="btn btn-success" name="signup" type="submit">SignUp</button>
         </form>
